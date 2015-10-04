@@ -93,7 +93,7 @@ namespace AdminUtils.Backup
 
                         mb.ExportInfo.AddCreateDatabase = true;
                         mb.ExportInfo.ExportTableStructure = true;
-                        mb.ExportInfo.ExportRows = false;
+                        mb.ExportInfo.ExportRows = true;
                         try
                         {
                             mb.ExportToFile(_fileNameSql);
@@ -144,7 +144,9 @@ namespace AdminUtils.Backup
         private static bool FtpUpload(Uri url)
         {
             Console.WriteLine("Select FTP method");
-            var ftpClient = (FtpWebRequest)FtpWebRequest.Create(url);
+            var fi = new FileInfo(_fileNameZip);
+
+            var ftpClient = (FtpWebRequest)FtpWebRequest.Create(url.AbsoluteUri+ "/"+fi.Name);
             if (ConfigurationManager.AppSettings["UserName"] != null)
             {
                 ftpClient.Credentials = new NetworkCredential(ConfigurationManager.AppSettings["UserName"],
@@ -153,7 +155,7 @@ namespace AdminUtils.Backup
             ftpClient.Method = WebRequestMethods.Ftp.UploadFile;
             ftpClient.UseBinary = true;
             ftpClient.KeepAlive = true;
-            var fi = new FileInfo(_fileNameZip);
+            
             ftpClient.ContentLength = fi.Length;
             var buffer = new byte[4097];
             var totalBytes = (int)fi.Length;
@@ -173,7 +175,7 @@ namespace AdminUtils.Backup
             {
                 using (var uploadResponse = (FtpWebResponse) ftpClient.GetResponse())
                 {
-                    Console.WriteLine("Upload status code {0}", (int)uploadResponse.StatusCode); 
+                    Console.WriteLine("Upload status code {0} {1}", (int)uploadResponse.StatusCode ,uploadResponse.StatusDescription); 
                 }
             }
             catch (Exception e)
@@ -182,7 +184,7 @@ namespace AdminUtils.Backup
                 Console.WriteLine("Details :{0}", e.Message);
                 return false;
             }
-
+            Console.WriteLine("Disconnect");
             return true;
 
 
