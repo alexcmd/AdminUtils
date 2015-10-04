@@ -3,6 +3,9 @@ Automotion administration utilities for cross-platform .net developing
 
 # Using
 
+## AdminUtils.Backup
+Utility to backup mysql database to remote server
+
 * Set up connection string "DefaultContext"
 * If need upload dump to remote server set params for remote connections
 
