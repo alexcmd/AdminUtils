@@ -24,7 +24,7 @@ Utility to backup mysql database to remote server
 ```
 <appSettings>
       <add key="Path" value="c:\temp"/>
-      <add key="RemoteServer" value="ssh://127.0.0.1"/SomeDir">
+      <add key="RemoteServer" value="ftp://127.0.0.1"/SomeDir">
       <add key="UserName" value="login"/>
       <add key="Password" value="password"/>
 </appSettings>
