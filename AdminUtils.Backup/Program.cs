@@ -20,6 +20,7 @@ namespace AdminUtils.Backup
             DateTime.Now.ToString("yyyyMMddhhmmss"));
 
         static string _fileNameSql = String.Format("{0}.sql", _fileName);
+        static string _fileNameData = String.Format("{0}_data.sql", _fileName);
         static string _fileNameZip = String.Format("{0}.zip", _fileName);
 
         static void Main(string[] args)
@@ -54,8 +55,10 @@ namespace AdminUtils.Backup
                 zip.CompressionLevel = CompressionLevel.BestCompression;
                 try
                 {
-                    ZipEntry ze = zip.AddFile(_fileNameSql, "");
+                    zip.AddFile(_fileNameSql, "");
+                    zip.AddFile(_fileNameData, "");
                     zip.Save(_fileNameZip);
+                    
                 }
                 catch (Exception e)
                 {
@@ -70,7 +73,7 @@ namespace AdminUtils.Backup
 
         private static bool MysqlCreateDump()
         {
-            Console.WriteLine("Creating dump...");
+            Console.WriteLine("Creating  dump...");
             using (
                 MySqlConnection conn =
                     new MySqlConnection(ConfigurationManager.ConnectionStrings["DefaultContext"].ConnectionString))
@@ -91,12 +94,50 @@ namespace AdminUtils.Backup
                             return false;
                         }
 
-                        mb.ExportInfo.AddCreateDatabase = true;
+                        mb.ExportInfo.AddCreateDatabase = false;
                         mb.ExportInfo.ExportTableStructure = true;
-                        mb.ExportInfo.ExportRows = true;
+                        mb.ExportInfo.ExportRows = false;
                         try
                         {
                             mb.ExportToFile(_fileNameSql);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Can't create struct dump");
+                            Console.WriteLine("Details :{0}", e.Message);
+                            return false;
+                        }
+                    }
+                }
+              
+            }
+
+            using (
+                MySqlConnection conn =
+                    new MySqlConnection(ConfigurationManager.ConnectionStrings["DefaultContext"].ConnectionString))
+            {
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    using (MySqlBackup mb = new MySqlBackup(cmd))
+                    {
+                        cmd.Connection = conn;
+                        try
+                        {
+                            conn.Open();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Can't connect to MySQL server");
+                            Console.WriteLine("Details :{0}", e.Message);
+                            return false;
+                        }
+
+                        mb.ExportInfo.AddCreateDatabase = false;
+                        mb.ExportInfo.ExportTableStructure = false;
+                        mb.ExportInfo.ExportRows = true;
+                        try
+                        {
+                            mb.ExportToFile(_fileNameData);
                         }
                         catch (Exception e)
                         {
