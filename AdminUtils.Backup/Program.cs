@@ -43,6 +43,7 @@ namespace AdminUtils.Backup
                         SshUpload(url);
                         break;
                 }
+                File.Delete(_fileNameZip);
             }
         }
 
@@ -68,6 +69,7 @@ namespace AdminUtils.Backup
                 }
             }
             File.Delete(_fileNameSql);
+            File.Delete(_fileNameData);
             return true;
         }
 
